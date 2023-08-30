@@ -50,7 +50,7 @@ struct BoxOfficeListView: View {
                 .toolbar {
                     Button{
                         Task {
-                         // await movieViewModel.loadBoxOfficeMovies()
+                            await movieViewModel.loadBoxOfficeMovies(language: localeIdentifier ?? "fr")
                         }
                     }label: {
                         Image(systemName: "arrow.triangle.2.circlepath")
