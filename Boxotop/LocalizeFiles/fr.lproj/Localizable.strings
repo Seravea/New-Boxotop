@@ -1,0 +1,13 @@
+/* 
+  Localizable.strings
+  Boxotop
+
+  Created by Romain Poyard on 23/06/2023.
+  
+*/
+"Watch trailer" = "Voir le trailer";
+"No trailer" = "Pas de trailer";
+"Audience" = "Spéctateurs";
+"Similar" = "Similaire";
+"Release date" = "Date de sortie";
+"My rating" = "Ma note";
