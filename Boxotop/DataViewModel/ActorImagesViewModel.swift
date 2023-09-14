@@ -10,20 +10,25 @@ import Foundation
 
 @MainActor class ActorImagesViewModel: ObservableObject {
     @Published private(set) var actorURLsImage: [PersonImageURL] = []
+    @Published var errorMessage: String?
+    @Published var isErrorAlertPresented: Bool = false
     
     
     func loadActorURLsImage(actorID: Int) async {
         let base: LoadingProperties = .actorImages(actorID: actorID)
         do {
-            guard base.ApiURL != nil else {
-                print("Couldn't load URL")
+            guard base.apiURL != nil else {
+                errorMessage = ErrorHandling.urlNil.message
+                isErrorAlertPresented = true
                 return
             }
             
             let (data, networkResponse) = try await URLSession.shared.data(for: base.myURLRequest)
             
             guard (networkResponse as? HTTPURLResponse)?.statusCode == 200 else {
-                fatalError("Error when fetching data on the URLSession \(networkResponse)")
+                errorMessage = ErrorHandling.urlSessionError(urlResponse: networkResponse).message
+                isErrorAlertPresented = true
+                return
             }
             
             let decoder = JSONDecoder()
@@ -32,7 +37,8 @@ import Foundation
             self.actorURLsImage = decodedData.profiles
             
         }catch {
-            fatalError("error when fetching data from TheMovieDatabase \(error)")
+            errorMessage = ErrorHandling.errorDatabase(errorString: error).message
+            isErrorAlertPresented = true
         }
         
     }

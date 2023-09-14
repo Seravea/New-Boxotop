@@ -7,9 +7,10 @@
 
 import Foundation
 
-@MainActor class MovieViewModel: ObservableObject {
+@MainActor final class MovieViewModel: ObservableObject {
     @Published private(set) var boxOfficeMovies: [Movie] = []
-   
+    @Published var errorMessage: String?
+    @Published var isErrorAlertPresented: Bool = false
     
     
     
@@ -17,15 +18,18 @@ import Foundation
         let base: LoadingProperties = .boxOfficeMovies(language: language)
         
         do {
-            guard base.ApiURL != nil else {
-                print("Couldn't load URL")
+            guard base.apiURL != nil else {
+                errorMessage = ErrorHandling.urlNil.message
+                isErrorAlertPresented = true
                 return
             }
             
             let (data, networkResponse) = try await URLSession.shared.data(for: base.myURLRequest)
             
             guard (networkResponse as? HTTPURLResponse)?.statusCode == 200 else {
-                fatalError("Error when fetching data on the URLSession \(networkResponse)")
+                errorMessage = ErrorHandling.urlSessionError(urlResponse: networkResponse).message
+                isErrorAlertPresented = true
+                return
             }
             
             let decoder = JSONDecoder()
@@ -34,7 +38,8 @@ import Foundation
             self.boxOfficeMovies = decodedData.results
             print("movies is ok !!")
         }catch {
-            fatalError("error when fetching data from TheMovieDatabase \(error)")
+            errorMessage = ErrorHandling.errorDatabase(errorString: error).message
+            isErrorAlertPresented = true
         }
         
         

@@ -12,6 +12,8 @@ import Foundation
     @Published private(set) var movieCasting: CastingResponse?
     @Published private(set) var similarMovies: [Movie] = []
     @Published var trailers: [TrailerFile] = []
+    @Published var errorMessage: String?
+    @Published var isErrorAlertPresented: Bool = false
     
     
     private func loadMovieCasting(movieID: Int, language: String) async {
@@ -19,15 +21,18 @@ import Foundation
         let base: LoadingProperties = .actorsList(movieID: movieID, language: language)
         
         do {
-            guard base.ApiURL != nil else {
-                print("Couldn't load URL")
+            guard base.apiURL != nil else {
+                errorMessage = ErrorHandling.urlNil.message
+                isErrorAlertPresented = true
                 return
             }
             
             let (data, networkResponse) = try await URLSession.shared.data(for: base.myURLRequest)
             
             guard (networkResponse as? HTTPURLResponse)?.statusCode == 200 else {
-                fatalError("Error when fetching data on the URLSession \(networkResponse)")
+                errorMessage = ErrorHandling.urlSessionError(urlResponse: networkResponse).message
+                isErrorAlertPresented = true
+                return
             }
             
             let decoder = JSONDecoder()
@@ -36,7 +41,8 @@ import Foundation
             self.movieCasting = decodedData
             
         }catch {
-            fatalError("error when fetching data from TheMovieDatabase \(error)")
+            errorMessage = ErrorHandling.errorDatabase(errorString: error).message
+            isErrorAlertPresented = true
         }
         
     }
@@ -47,8 +53,9 @@ import Foundation
         let base: LoadingProperties = .similarMovies(movieID: movieID, language: language)
         
         do {
-            guard base.ApiURL != nil else {
-                print("Couldn't load URL")
+            guard base.apiURL != nil else {
+                errorMessage = ErrorHandling.urlNil.message
+                isErrorAlertPresented = true
                 return
             }
             
@@ -56,7 +63,9 @@ import Foundation
             let (data, networkResponse) = try await URLSession.shared.data(for: base.myURLRequest)
             
             guard (networkResponse as? HTTPURLResponse)?.statusCode == 200 else {
-                fatalError("Error when fetching data on the URLSession \(networkResponse)")
+                errorMessage = ErrorHandling.urlSessionError(urlResponse: networkResponse).message
+                isErrorAlertPresented = true
+                return
             }
             
             let decoder = JSONDecoder()
@@ -65,7 +74,8 @@ import Foundation
             self.similarMovies = decodedData.results
             
         }catch {
-            fatalError("error when fetching data from TheMovieDatabase \(error)")
+            errorMessage = ErrorHandling.errorDatabase(errorString: error).message
+            isErrorAlertPresented = true
         }
         
         
@@ -75,15 +85,18 @@ import Foundation
         let base: LoadingProperties = .movieTrailers(movieID: movieID, language: language)
         
         do {
-            guard let url = base.ApiURL else {
-                print("Couldn't load URL")
+            guard base.apiURL != nil else {
+                errorMessage = ErrorHandling.urlNil.message
+                isErrorAlertPresented = true
                 return
             }
             
             let (data, networkResponse) = try await URLSession.shared.data(for: base.myURLRequest)
             
             guard (networkResponse as? HTTPURLResponse)?.statusCode == 200 else {
-                fatalError("Error when fetching data on the URLSession \(networkResponse)")
+                errorMessage = ErrorHandling.urlSessionError(urlResponse: networkResponse).message
+                isErrorAlertPresented = true
+                return
             }
             
             let decoder = JSONDecoder()
@@ -93,7 +106,8 @@ import Foundation
             self.trailers = decodedData.results
             
         }catch {
-            fatalError("error when fetching data from TheMovieDatabase \(error)")
+            errorMessage = ErrorHandling.errorDatabase(errorString: error).message
+            isErrorAlertPresented = true
         }
         
     }
@@ -104,7 +118,7 @@ import Foundation
             await loadMovieCasting(movieID: movieID, language: language)
             await loadSimilarMovies(movieID: movieID, language: language)
             await loadTrailerVideoFile(movieID: movieID, language: language)
-            print("this movie is showing")
+            
         }
     }
     

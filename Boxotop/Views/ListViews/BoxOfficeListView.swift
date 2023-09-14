@@ -8,9 +8,13 @@
 import SwiftUI
 
 struct BoxOfficeListView: View {
+    
+    
     @Environment(\.locale.language.languageCode?.identifier) var localeIdentifier
     @State var mySearchText: String = ""
     @StateObject var movieViewModel = MovieViewModel()
+    
+    
     
     var body: some View {
         NavigationStack {
@@ -63,6 +67,11 @@ struct BoxOfficeListView: View {
         .foregroundColor(.white)
         .fontDesign(.rounded)
         .environment(\.colorScheme, .dark)
+        .alert(movieViewModel.errorMessage ?? "Error", isPresented: $movieViewModel.isErrorAlertPresented) {
+            Button("OK") {
+                movieViewModel.errorMessage = nil
+            }
+        }
         
     }
 }
@@ -70,6 +79,6 @@ struct BoxOfficeListView: View {
 struct BoxOfficeListView_Previews: PreviewProvider {
     static var previews: some View {
         BoxOfficeListView()
-            .environment(\.locale, .init(identifier: "fr"))
+            .environment(\.locale, .init(identifier: "en"))
     }
 }

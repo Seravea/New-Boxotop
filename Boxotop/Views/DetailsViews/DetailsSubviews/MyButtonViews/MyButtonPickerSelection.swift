@@ -17,7 +17,7 @@ struct MyButtonPickerSelection: View {
                 selectedPicker = selectionTitle
             }
         }label: {
-            Text(selectionTitle.localizedString())
+            Text(selectionTitle.rawValue)
                 .frame(width: 69)
                 .foregroundColor(selectedPicker == selectionTitle ? .black : .white)
             

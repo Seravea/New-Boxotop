@@ -186,7 +186,11 @@ struct TestMovieDetailsView: View {
                 
             }
             .foregroundColor(.white)
-            
+            .alert(movieDetailsViewModel.errorMessage ?? "Error", isPresented: $movieDetailsViewModel.isErrorAlertPresented) {
+                Button("OK") {
+                    movieDetailsViewModel.errorMessage = nil
+                }
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
     }

@@ -43,7 +43,7 @@ enum LoadingProperties {
         ]
     }
     
-    var ApiURL: URL? {
+    var apiURL: URL? {
         switch self {
         case .boxOfficeMovies(let language):
             return URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=\(apiKey)&language=\(checkAndReturnLocaleIdentifierForURL(localeToCheck: language))&page=1")!
@@ -61,7 +61,7 @@ enum LoadingProperties {
     }
     
     var myURLRequest: URLRequest {
-        var returnURLRequest = URLRequest(url: self.ApiURL!)
+        var returnURLRequest = URLRequest(url: self.apiURL!)
         returnURLRequest.httpMethod = "GET"
         returnURLRequest.allHTTPHeaderFields = headers
         return returnURLRequest
@@ -89,7 +89,24 @@ enum PickerSelection: String, CaseIterable {
     case casting = "Casting"
     case similar = "Similar"
     
-    func localizedString() -> String {
-            return NSLocalizedString(self.rawValue, comment: "")
+//    func localizedString() -> String {
+//            return NSLocalizedString(self.rawValue, comment: "")
+//        }
+}
+
+enum ErrorHandling: Error {
+    case urlNil
+    case urlSessionError(urlResponse: URLResponse)
+    case errorDatabase(errorString: Error)
+    
+    var message: String {
+        switch self {
+        case .urlNil:
+            return "Couldn't load URL"
+        case .urlSessionError(let urlResponse):
+            return "Error when fetching data on URLSession \(urlResponse)"
+        case .errorDatabase(let error):
+            return "Error when fetching data in The Movie Database\nError: \(error.localizedDescription)"
         }
+    }
 }
